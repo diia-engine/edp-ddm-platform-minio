@@ -77,10 +77,15 @@ resource "null_resource" "minio_userdata" {
     inline = [
       "export minio_root_password=${random_password.password.result}",
       "export minio_root_user=${var.minio_root_user}",
-      "export minio_url=${var.minio_url}",
+      "export minio_download_url=${var.minio_download_url}",
+      "export mc_download_url=${var.mc_download_url}",
       "export minio_volume_path=${var.minio_volume_path}",
       "export minio_local_mount_path=${var.minio_local_mount_path}",
       "export bucket_name=${var.backup_bucket_name}",
+      "export kes_download_url=${var.kes_download_url}",
+      "export vault_ip=${var.vault_ip}",
+      "export vault_auth_role_id=${var.vault_auth_role_id}",
+      "export vault_auth_secret_id=${var.vault_auth_secret_id}",
       "chmod +x /tmp/userdata.sh",
       "sudo -E /tmp/userdata.sh"
     ]
@@ -102,4 +107,26 @@ resource "null_resource" "minio_init" {
     }
   }
   depends_on = [null_resource.minio_userdata]
+}
+
+module "kes_minio_api_key" {
+  source     = "github.com/matti/terraform-shell-outputs.git"
+  command    = <<EOT
+          timeout ${var.connection_timeout}s bash -c '
+          while ! nc -w 2 ${var.vsphere_minio_instance_ip} 22 > /dev/null ; do
+              sleep 5;
+          done' && ssh -o 'StrictHostKeyChecking no' \
+                 -o 'ConnectionAttempts 5' \
+                 -i ./packer/private.key  mdtuddm@${var.vsphere_minio_instance_ip} \
+                  timeout ${var.connection_timeout}s bash -c '
+          while [ ! -e /etc/minio/kes-client/platform-api-key ] ; do
+              sleep 5;
+          done' && ssh -o "StrictHostKeyChecking no" \
+                       -o "ConnectionAttempts 5" \
+                       -i ./packer/private.key \
+                       mdtuddm@${var.vsphere_minio_instance_ip} \
+                       cat /etc/minio/kes-client/platform-api-key
+          '
+  EOT
+  depends_on = [null_resource.minio_init]
 }

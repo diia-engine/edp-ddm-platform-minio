@@ -12,11 +12,28 @@ resource "aws_instance" "minio" {
 
   ebs_optimized = false
 
+  metadata_options {
+    http_tokens = "required"
+  }
+
   tags = merge(local.tags, {
     "Name" = "platform-minio-${var.cluster_name}"
   })
 
-  user_data = data.template_file.minio.rendered
+  user_data = templatefile("${path.module}/scripts/userdata.tpl",{
+    minio_root_password  = random_password.password.result
+    minio_root_user      = var.minio_root_user
+    minio_url            = var.minio_url
+    mc_url               = var.mc_url
+    minio_volume_path    = var.minio_volume_path
+    bucket_name          = var.backup_bucket_name
+    aws_region           = var.aws_region
+    kes_download_url     = var.kes_download_url
+    vault_ip             = var.vault_ip
+    vault_auth_role_id   = var.vault_auth_role_id
+    vault_auth_secret_id = var.vault_auth_secret_id
+  }
+  )
 
 }
 
@@ -49,7 +66,7 @@ resource "aws_security_group" "minio" {
     from_port   = 9001
     to_port     = 9001
     protocol    = "tcp"
-    cidr_blocks = ["${chomp(data.http.external_ip.body)}/32"]
+    cidr_blocks = ["${chomp(data.http.external_ip.response_body)}/32"]
   }
 
   ingress {
@@ -65,12 +82,18 @@ resource "aws_security_group" "minio" {
     protocol    = "tcp"
     cidr_blocks = ["${data.aws_nat_gateway.cluster_ip.public_ip}/32"]
   }
+  ingress {
+    from_port   = 7373
+    to_port     = 7373
+    protocol    = "tcp"
+    cidr_blocks = ["${data.aws_nat_gateway.cluster_ip.public_ip}/32"]
+  }
 
   ingress {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = ["${chomp(data.http.external_ip.body)}/32"]
+    cidr_blocks = ["${chomp(data.http.external_ip.response_body)}/32"]
   }
 
 

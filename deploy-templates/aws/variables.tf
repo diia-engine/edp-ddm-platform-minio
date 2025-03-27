@@ -12,28 +12,43 @@ variable "vpc_cidr" {
   default     = "192.168.100.0/24"
 }
 
+variable "connection_timeout" {
+  type    = number
+  default = 300
+}
+
 variable "minio_url" {
   type    = string
-  default = "https://dl.min.io/server/minio/release/linux-amd64/minio"
+  default = "https://dl.min.io/server/minio/release/linux-amd64/archive/minio.RELEASE.2025-04-22T22-12-26Z"
 }
+
+variable "mc_url" {
+  type    = string
+  default = "https://dl.min.io/client/mc/release/linux-amd64/archive/mc.RELEASE.2025-04-16T18-13-26Z"
+}
+
 variable "minio_root_user" {
   type    = string
   default = "minio"
 }
+
 variable "minio_volume_path" {
   type    = string
   default = "/dev/xvdh"
 }
+
 variable "minio_ec2_instance_type" {
   type        = string
   description = "Default instance size for minio instance"
   default     = "t2.micro"
 }
+
 variable "minio_ebs_volume_size" {
   type        = string
   description = "Default data volumes size for storage"
   default     = 300
 }
+
 variable "cluster_name" {
   type        = string
   description = "Cluster name"
@@ -58,10 +73,28 @@ variable "wait_for_cluster_interpreter" {
   default     = ["/bin/sh", "-c"]
 }
 
-variable "baseDomain" {
-  description = "baseDomain"
+variable "kes_download_url" {
   type        = string
-  default     = "mdtu-ddm.projects.epam.com"
+  default     = "https://github.com/minio/kes/releases/download/2025-03-12T09-35-18Z/kes-linux-amd64"
+  description = "Minio KES binary download URL"
+}
+
+variable "vault_auth_secret_id" {
+  type        = string
+  default     = "secret"
+  description = "Minio KES server secret id for vault auth"
+}
+
+variable "vault_auth_role_id" {
+  type        = string
+  default     = "roleid"
+  description = "Minio KES server role id for vault auth"
+}
+
+variable "vault_ip" {
+  type        = string
+  default     = "127.0.0.1"
+  description = "Minio KES server auth path"
 }
 
 variable "tags" {

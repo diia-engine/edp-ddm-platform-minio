@@ -1,5 +1,5 @@
 resource "aws_eip" "minio_ip" {
-  vpc = true
+  domain = "vpc"
   tags = merge(local.tags, {
     "Name" = "platform-minio-ip-${var.cluster_name}"
   })

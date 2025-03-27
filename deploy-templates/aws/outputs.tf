@@ -15,3 +15,8 @@ output "minio_password" {
 output "minio_elastic_ip" {
   value = aws_eip.minio_ip.public_ip
 }
+
+output "minio_kes_api_key" {
+  sensitive = true
+  value     = module.kes_minio_api_key.stdout
+}

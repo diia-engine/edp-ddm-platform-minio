@@ -52,23 +52,24 @@ resource "random_password" "password" {
 }
 
 
-data "template_file" "minio" {
-  template = file("./scripts/userdata.tpl")
-
-  vars = {
-    minio_root_password = random_password.password.result
-    minio_root_user     = var.minio_root_user
-    minio_url           = var.minio_url
-    minio_volume_path   = var.minio_volume_path
-    bucket_name         = var.backup_bucket_name
-    aws_region          = var.aws_region
-  }
-}
-
-data "template_file" "format_ssh" {
-  template = "connect to host with following command: ssh ubuntu@$${admin} -i private_minio.key"
-
-  vars = {
-    admin = aws_eip.minio_ip.public_ip
-  }
+module "kes_minio_api_key" {
+  source     = "github.com/matti/terraform-shell-outputs.git"
+  command    = <<EOT
+          timeout ${var.connection_timeout}s bash -c '
+          while ! nc -w 2 ${aws_eip.minio_ip.public_ip} 22 > /dev/null ; do
+              sleep 5;
+          done' && ssh -o 'StrictHostKeyChecking no' \
+                 -o 'ConnectionAttempts 5' \
+                 -i private_minio.key  ubuntu@${aws_eip.minio_ip.public_ip} \
+                  timeout ${var.connection_timeout}s bash -c '
+          while [ ! -e /etc/minio/kes-client/platform-api-key ] ; do
+              sleep 5;
+          done' && ssh -o "StrictHostKeyChecking no" \
+                       -o "ConnectionAttempts 5" \
+                       -i private_minio.key \
+                       ubuntu@${aws_eip.minio_ip.public_ip} \
+                       cat /etc/minio/kes-client/platform-api-key
+          '
+  EOT
+  depends_on = [null_resource.minio_init]
 }

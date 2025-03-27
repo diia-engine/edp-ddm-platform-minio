@@ -57,7 +57,7 @@ No modules.
 | <a name="input_minio_ebs_volume_size"></a> [minio\_ebs\_volume\_size](#input\_minio\_ebs\_volume\_size) | Default data volumes size for storage | `string` | `300` | no |
 | <a name="input_minio_ec2_instance_type"></a> [minio\_ec2\_instance\_type](#input\_minio\_ec2\_instance\_type) | Default instance size for minio instance | `string` | `"t2.micro"` | no |
 | <a name="input_minio_root_user"></a> [minio\_root\_user](#input\_minio\_root\_user) | n/a | `string` | `"minio"` | no |
-| <a name="input_minio_url"></a> [minio\_url](#input\_minio\_url) | n/a | `string` | `"https://dl.min.io/server/minio/release/linux-amd64/minio"` | no |
+| <a name="input_minio_url"></a> [minio\_url](#input\_minio\_url) | n/a | `string` | `"https://dl.min.io/server/minio/release/linux-amd64/archive/minio.RELEASE.2025-04-22T22-12-26Z"` | no |
 | <a name="input_minio_volume_path"></a> [minio\_volume\_path](#input\_minio\_volume\_path) | n/a | `string` | `"/dev/xvdh"` | no |
 | <a name="input_tags"></a> [tags](#input\_tags) | A map of tags to add to all resources. | `map(any)` | n/a | yes |
 | <a name="input_vpc_cidr"></a> [vpc\_cidr](#input\_vpc\_cidr) | CIDR of the VPC | `string` | `"192.168.100.0/24"` | no |

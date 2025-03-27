@@ -99,9 +99,14 @@ variable "wait_for_cluster_interpreter" {
   default     = ["/bin/sh", "-c"]
 }
 
-variable "minio_url" {
+variable "minio_download_url" {
   type    = string
-  default = "https://dl.min.io/server/minio/release/linux-amd64/minio"
+  default = "https://dl.min.io/server/minio/release/linux-amd64/archive/minio.RELEASE.2025-04-22T22-12-26Z"
+}
+
+variable "mc_download_url" {
+  type    = string
+  default = "https://dl.min.io/client/mc/release/linux-amd64/archive/mc.RELEASE.2025-04-16T18-13-26Z"
 }
 
 variable "minio_root_user" {
@@ -123,4 +128,34 @@ variable "backup_bucket_name" {
   type        = string
   description = "Bucket name for storing backups"
   default     = "mdtuddm"
+}
+
+variable "kes_download_url" {
+  type        = string
+  default     = "https://github.com/minio/kes/releases/download/2025-03-12T09-35-18Z/kes-linux-amd64"
+  description = "Minio KES binary download URL"
+}
+
+variable "vault_auth_secret_id" {
+  type        = string
+  default     = "secret"
+  description = "Minio KES server secret id for vault auth"
+}
+
+variable "vault_auth_role_id" {
+  type        = string
+  default     = "roleid"
+  description = "Minio KES server role id for vault auth"
+}
+
+variable "vault_ip" {
+  type        = string
+  default     = "127.0.0.1"
+  description = "Minio KES server auth path"
+}
+
+variable "connection_timeout" {
+  type    = number
+  default = 300
+  description = "Timeout for connection"
 }
